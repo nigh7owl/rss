@@ -52,7 +52,7 @@ test('automatischer Versand: einmal am Tag ab der Uhrzeit, heute und gestern', a
   const service = new Service(store, { log: quiet });
   assert.equal(await service.autoSendDue(Date.parse('2026-11-20T22:00:00Z')), false, '23:00 in Berlin: noch nicht');
   assert.equal(await service.autoSendDue(Date.parse('2026-11-20T22:31:00Z')), true);
-  assert.deepEqual(puts, ['/api/sources/files/2026/2026-11-19 Tageszusammenfassung.md', '/api/sources/files/2026/2026-11-20 Tageszusammenfassung.md']);
+  assert.deepEqual(puts, ['/api/sources/files/2026/11 November/2026-11-19 Tageszusammenfassung.md', '/api/sources/files/2026/11 November/2026-11-20 Tageszusammenfassung.md']);
   assert.equal(await service.autoSendDue(Date.parse('2026-11-20T22:50:00Z')), false, 'nicht zweimal');
   store.settings.autoSend = false;
   assert.equal(await service.autoSendDue(Date.parse('2026-11-21T22:50:00Z')), false, 'abgeschaltet');
@@ -60,7 +60,7 @@ test('automatischer Versand: einmal am Tag ab der Uhrzeit, heute und gestern', a
 
 test('Einstellungen prüfen; Schlüssel nie an eine neue Adresse', () => {
   const cur = { ...DEFAULT_SETTINGS, booksUrl: 'http://nas:3000', booksToken: 'books_alt' };
-  const base = { ...cur, booksToken: '', booksDaily: '1' };
+  const base = { ...cur, booksToken: '', booksDaily: '1', autoSend: undefined }; // nicht angehakt = fehlt im Formular
   assert.equal(cleanSettings(base, cur).booksToken, 'books_alt', 'leer = behalten');
   assert.equal(cleanSettings({ ...base, booksUrl: 'http://nas:3000/' }, cur).booksToken, 'books_alt');
   assert.equal(cleanSettings({ ...base, booksUrl: 'https://anders:3000' }, cur).booksToken, '');
@@ -68,6 +68,7 @@ test('Einstellungen prüfen; Schlüssel nie an eine neue Adresse', () => {
   assert.equal(cleanSettings({ ...base, removeToken: '1' }, cur).booksToken, '');
   assert.equal(cleanSettings(base, cur).booksDaily, true);
   assert.equal(cleanSettings(base, cur).autoSend, false, 'nicht angehakt = aus');
+  assert.equal(DEFAULT_SETTINGS.autoSend, true, 'Standard: automatisch senden, sobald Books verbunden ist');
   for (const bad of [{ timezone: 'Mond/Basis' }, { sendTime: '25:00' }, { refreshMinutes: '1' }, { booksUrl: 'ftp://x' }, { booksUrl: 'http://a:b@x' }, { keepDays: '0' }]) {
     assert.throws(() => cleanSettings({ ...base, ...bad }, cur));
   }

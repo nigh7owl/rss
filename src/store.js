@@ -17,10 +17,10 @@ export const DEFAULT_SETTINGS = {
   keepDays: 60, // Meldungen aufbewahren
   booksUrl: '', // z. B. http://nas:3000
   booksToken: '', // Schlüssel einer Quelle (books_…)
-  booksPath: '{jahr}/{datum} Tageszusammenfassung.md', // Pfad im Zielordner der Quelle
+  booksPath: '{jahr}/{monat} {monatsname}/{datum} Tageszusammenfassung.md', // Pfad im Zielordner: Buch je Jahr, Kapitel je Monat
   booksDaily: true, // `daily:` ins Frontmatter → Books bettet die Zusammenfassung in die tägliche Notiz ein
   booksExcerpts: true, // Kurztext unter jeder Meldung
-  autoSend: false, // täglich automatisch senden
+  autoSend: true, // täglich automatisch senden (sobald Adresse und Schlüssel eingetragen sind)
   sendTime: '23:30', // Uhrzeit dafür
   appUrl: '', // eigene Adresse (optional) – Books zeigt dann „Original öffnen“
 };

@@ -23,10 +23,11 @@ Hier steht alles, was bei der Arbeit an rss zu beachten ist, und was für die Zu
 
 - rss nutzt ausschließlich die vorhandene Schnittstelle „Quellen und Webclipper“ von Books (`/api/sources`, siehe README dort): ein Schlüssel der Art **Quelle**, `PUT /api/sources/files/<Pfad>` mit `Content-Type: text/markdown`, `GET /api/sources` zum Prüfen (`src/books.js`). Books ändert dafür nichts.
 - Books speichert nur bei inhaltlicher Änderung und legt den vorigen Stand in den Versionsverlauf; rss darf deshalb denselben Tag beliebig oft senden. `source` und `source_updated` setzt Books, nicht rss.
-- Frontmatter der Zusammenfassung (`summaryMarkdown` in `src/summary.js`): `title`, auf Wunsch `daily: JJJJ-MM-TT` mit `order: 20` (Books bettet die Seite dann über „Quellen im Tagebuch“ in die tägliche Notiz ein; trailuma belegt `order` 1–4), `tags: [rss]`, `meldungen`, `feeds`, optional `source_url` (eigene Adresse → „Original öffnen“ in Books).
+- Eine Markdown-Datei je Tag. Aufbau in Books (Standardpfad `{jahr}/{monat} {monatsname}/{datum} Tageszusammenfassung.md` in `DEFAULT_SETTINGS`): Regal der Quelle → Buch je Jahr → Kapitel je Monat (Ordner „11 November“; Books zeigt „November“ und sortiert nach der Zahl, `cleanName` dort) → Seite je Tag. Jahre ohne Zahl-Präfix sortiert Books numerisch nach dem Namen.
+- Frontmatter der Zusammenfassung (`summaryMarkdown` in `src/summary.js`): `title` (der Tag ausgeschrieben), `order` = Tag im Monat (immer – sortiert die Seiten im Monatskapitel; in der täglichen Notiz zählt `order` nur innerhalb des Kastens dieser Quelle, stört also trailuma nicht), auf Wunsch `daily: JJJJ-MM-TT` (Books bettet die Seite dann über „Quellen im Tagebuch“ in die tägliche Notiz ein), `tags: [rss]`, `meldungen`, `feeds`, optional `source_url` (eigene Adresse → „Original öffnen“ in Books).
 - Fremder Text im Markdown läuft durch `mdEscape`: neben Markdown auch die Obsidian-Syntax, die Books versteht (`#tag`, `[[…]]`, `$…$`, `==…==`, `%%…%%`), damit Meldungen keine Tags, Links oder Formeln erzeugen.
 - Der Schlüssel steht im Klartext in `settings.json` (Datei mit Rechten 0600), wird im Formular nie angezeigt (nur die ersten Zeichen) und nie an eine neue Adresse geschickt: Ändert sich die Adresse von Books ohne neuen Schlüssel, wird der alte verworfen (`cleanSettings`).
-- Automatischer Versand (`autoSendDue` in `src/service.js`): einmal am Tag ab der eingestellten Uhrzeit, vorher Feeds abrufen, dann Vortag und Tag senden (der Vortag fängt Meldungen nach dem letzten Versand ein). Der Merker `lastAutoSend` steht in `sends.json` (`_state`), damit ein Neustart nicht doppelt sendet und ein verpasster Versand nachgeholt wird.
+- Automatischer Versand (`autoSendDue` in `src/service.js`, Standard an, wirkt erst mit Adresse und Schlüssel): einmal am Tag ab der eingestellten Uhrzeit, vorher Feeds abrufen, dann Vortag und Tag senden (der Vortag fängt Meldungen nach dem letzten Versand ein). Der Merker `lastAutoSend` steht in `sends.json` (`_state`), damit ein Neustart nicht doppelt sendet und ein verpasster Versand nachgeholt wird.
 
 ### Tage und Meldungen
 
@@ -41,6 +42,8 @@ Hier steht alles, was bei der Arbeit an rss zu beachten ist, und was für die Zu
 - Feeds: höchstens 10 MB, 20 s Zeitlimit, bedingte Anfragen (ETag/Last-Modified).
 
 ## Ideen für später
+
+- Volltext der Artikel: aus dem Feed (`content:encoded`, Atom `content`), sofern vorhanden, sonst die Artikelseite abrufen und den Hauptinhalt nach Markdown wandeln – in der Tagesdatei zu lang, eher als eigene Seiten je Artikel unter dem Tag.
 
 - OPML-Import und -Export der Feeds.
 - Gelesen/ungelesen und eine Suche über alle Meldungen.

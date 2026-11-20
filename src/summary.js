@@ -1,13 +1,12 @@
 // Tageszusammenfassung als Markdown für Books: alle Meldungen eines Tages, nach Feed gruppiert.
 //
-// Frontmatter: `title`, auf Wunsch `daily` (Books bettet die Seite dann in die tägliche Notiz ein, siehe
-// „Quellen im Tagebuch“ in Books) mit `order`, dazu `tags`, `meldungen` und `feeds`. `source` und
+// In Books: Zielordner der Quelle (Regal) → Buch je Jahr → Kapitel je Monat → Seite je Tag.
+// Frontmatter: `title` (der Tag), `order` (Tag im Monat – sortiert die Seiten im Monatskapitel; in der täglichen
+// Notiz zählt `order` nur innerhalb des Kastens dieser Quelle), auf Wunsch `daily` (Books bettet die Seite dann in die
+// tägliche Notiz ein, siehe „Quellen im Tagebuch“ in Books), dazu `tags`, `meldungen` und `feeds`. `source` und
 // `source_updated` ergänzt Books selbst.
 
-import { germanDay, longDay, timeOf } from './days.js';
-
-/** Reihenfolge in der täglichen Notiz von Books (trailuma belegt 1–4). */
-export const DAILY_ORDER = 20;
+import { longDay, timeOf } from './days.js';
 
 /**
  * Text für Markdown entschärfen – auch Obsidian-Syntax, die Books versteht: #tags, [[Links]], $Formeln$,
@@ -28,10 +27,21 @@ export const mdUrl = (url) => String(url).replace(/[\s()<>]/g, (c) => `%${c.char
 /** YAML-Wert in doppelten Anführungszeichen. */
 const yamlString = (value) => JSON.stringify(String(value));
 
-/** Pfad der Zusammenfassung in Books: {jahr}, {monat}, {tag}, {datum} im Muster ersetzen. */
+const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+/**
+ * Pfad der Zusammenfassung in Books: {jahr}, {monat} (11), {monatsname} (November), {tag} (20), {datum} (JJJJ-MM-TT).
+ * Standard „{jahr}/{monat} {monatsname}/…“: Books zeigt den Ordner „11 November“ als Kapitel „November“ und sortiert
+ * ihn nach der Zahl vorn.
+ */
 export function summaryPath(pattern, day) {
   const [jahr, monat, tag] = day.split('-');
-  return pattern.replaceAll('{jahr}', jahr).replaceAll('{monat}', monat).replaceAll('{tag}', tag).replaceAll('{datum}', day);
+  return pattern
+    .replaceAll('{jahr}', jahr)
+    .replaceAll('{monatsname}', MONTHS[Number(monat) - 1])
+    .replaceAll('{monat}', monat)
+    .replaceAll('{tag}', tag)
+    .replaceAll('{datum}', day);
 }
 
 /** Meldungen nach Feed gruppieren: [{ feed, items }], Feeds alphabetisch. */
@@ -56,14 +66,14 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 export function summaryMarkdown(day, items, feeds, settings, { appUrl = '' } = {}) {
   const groups = groupByFeed(items, feeds);
   const count = groups.reduce((n, g) => n + g.items.length, 0);
-  const front = ['---', `title: ${yamlString(`Tageszusammenfassung ${germanDay(day)}`)}`];
-  if (settings.booksDaily) front.push(`daily: ${day}`, `order: ${DAILY_ORDER}`);
+  const front = ['---', `title: ${yamlString(longDay(day))}`, `order: ${Number(day.slice(8))}`];
+  if (settings.booksDaily) front.push(`daily: ${day}`);
   front.push('tags:', '  - rss', `meldungen: ${count}`, `feeds: ${groups.length}`);
   if (appUrl) front.push(`source_url: ${yamlString(`${appUrl}/tag/${day}`)}`);
   front.push('---', '');
 
   const lines = [...front];
-  lines.push(`${longDay(day)} · ${plural(count, 'Meldung', 'Meldungen')} aus ${plural(groups.length, 'Feed', 'Feeds')}`, '');
+  lines.push(`${plural(count, 'Meldung', 'Meldungen')} aus ${plural(groups.length, 'Feed', 'Feeds')}`, '');
   if (!count) {
     lines.push('*An diesem Tag gab es keine Meldungen.*', '');
     return lines.join('\n');

@@ -246,7 +246,7 @@ export function settingsView(ctx, { msg, info = null }) {
     ${field('booksUrl', 'Adresse von Books', s.booksUrl, { type: 'url', attrs: 'placeholder="http://nas:3000"', hint: 'Ohne HTTPS geht der Schlüssel im Klartext über das Netz.' })}
     ${field('booksToken', 'Schlüssel der Quelle', '', { type: 'password', attrs: `autocomplete="new-password" placeholder="${s.booksToken ? '••••••••' : 'books_…'}"`, hint: tokenHint })}
     ${s.booksToken ? check('removeToken', 'Schlüssel entfernen') : ''}
-    ${field('booksPath', 'Pfad im Zielordner', s.booksPath, { hint: 'Platzhalter: <code>{jahr}</code>, <code>{monat}</code>, <code>{tag}</code>, <code>{datum}</code> (JJJJ-MM-TT).' })}
+    ${field('booksPath', 'Pfad im Zielordner', s.booksPath, { hint: 'Platzhalter: <code>{jahr}</code>, <code>{monat}</code> (11), <code>{monatsname}</code> (November), <code>{tag}</code>, <code>{datum}</code> (JJJJ-MM-TT). Standard: im Regal der Quelle ein Buch je Jahr, darin ein Kapitel je Monat und eine Seite je Tag.' })}
     ${check('booksDaily', 'Im Tagebuch von Books einbetten', s.booksDaily, 'Setzt <code>daily: JJJJ-MM-TT</code> im Frontmatter.')}
     ${check('booksExcerpts', 'Kurztext unter jeder Meldung', s.booksExcerpts)}
     ${field('appUrl', 'Eigene Adresse (optional)', s.appUrl, { type: 'url', attrs: 'placeholder="http://nas:3001"', hint: 'Dann zeigt Books „Original öffnen“ mit einem Link auf den Tag hier.' })}

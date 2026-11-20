@@ -6,7 +6,8 @@ Ein kleiner RSS-Leser im schlichten Stil von [Books](https://github.com/nigh7owl
 
 - **Feeds abonnieren:** RSS 2.0, RSS 1.0 (RDF) und Atom. Statt der Feed-Adresse reicht auch die Adresse der Webseite, wenn sie auf ihren Feed verweist.
 - **Tagesansicht:** alle Meldungen eines Tages, nach Feed gruppiert, mit Uhrzeit und Kurztext; links die letzten Tage mit Anzahl, rechts die Aktionen. Vor- und zurückblättern, „Heute“.
-- **An Books senden:** von Hand je Tag oder **automatisch jeden Tag** zur eingestellten Uhrzeit (dabei auch der Vortag, falls nach dem letzten Versand noch etwas kam). Books speichert nur, wenn sich etwas geändert hat; der vorige Stand bleibt im Versionsverlauf der Seite.
+- **An Books senden:** **automatisch jeden Tag** zur eingestellten Uhrzeit (Standard 23:30, eingeschaltet, sobald Adresse und Schlüssel eingetragen sind; dabei auch der Vortag, falls nach dem letzten Versand noch etwas kam) oder von Hand je Tag. Eine Markdown-Datei je Tag. Books speichert nur, wenn sich etwas geändert hat; der vorige Stand bleibt im Versionsverlauf der Seite.
+- **Ordnung in Books:** im Regal der Quelle ein **Buch je Jahr**, darin ein **Kapitel je Monat** und eine **Seite je Tag**, alles in der richtigen Reihenfolge.
 - **Im Tagebuch von Books:** Die Zusammenfassung trägt `daily: JJJJ-MM-TT` – ist in Books „Quellen im Tagebuch“ an, erscheint sie in der täglichen Notiz.
 - **Markdown herunterladen** und als Vorschau ansehen, genau so, wie es an Books geht.
 - Abruf alle 30 Minuten (einstellbar), mit ETag/Last-Modified; alte Meldungen werden nach 60 Tagen (einstellbar) entfernt.
@@ -49,22 +50,34 @@ node bin/rss.js /pfad/zu/daten --senden
 
 1. In Books unter **Konto → Quellen und Webclipper** eine neue **Quelle** anlegen, z. B. „RSS“. Der Zielordner ist dann das Regal „RSS“ (später änderbar). Den Schlüssel (`books_…`) kopieren – Books zeigt ihn nur einmal.
 2. In RSS unter **Einstellungen** die Adresse von Books (z. B. `http://nas:3000`) und den Schlüssel eintragen, speichern, „Verbindung zu Books prüfen“.
-3. Auf einer Tagesseite „An Books senden“ – oder unter *Zeitplan* „Jeden Tag automatisch an Books senden“ anhaken.
+3. Fertig: Ab jetzt geht jeden Tag um 23:30 die Zusammenfassung an Books (Uhrzeit und Schalter unter *Zeitplan*). Auf einer Tagesseite schickt „An Books senden“ einen Tag sofort.
 
-Die Datei landet unter `RSS/2026/2026-11-20 Tageszusammenfassung.md` (Pfad im Zielordner einstellbar, Platzhalter `{jahr}`, `{monat}`, `{tag}`, `{datum}`) und sieht so aus:
+Die Datei landet unter `RSS/2026/11 November/2026-11-20 Tageszusammenfassung.md`. Books zeigt das so:
+
+```
+RSS                         ← Regal (Zielordner der Quelle)
+├── 2025                    ← Buch je Jahr
+└── 2026
+    ├── Oktober             ← Kapitel je Monat (Ordner „10 Oktober“, sortiert nach der Zahl)
+    └── November
+        ├── Dienstag, 3. November 2026   ← Seite je Tag (sortiert über order = Tag im Monat)
+        └── Freitag, 20. November 2026
+```
+
+Läuft Books ohne Regale (`--no-shelves`), ist der Zielordner das Buch und Jahre und Monate sind Kapitel. Der Pfad im Zielordner ist einstellbar (Platzhalter `{jahr}`, `{monat}`, `{monatsname}`, `{tag}`, `{datum}`). Eine Datei sieht so aus:
 
 ```markdown
 ---
-title: "Tageszusammenfassung 20.11.2026"
-daily: 2026-11-20
+title: "Freitag, 20. November 2026"
 order: 20
+daily: 2026-11-20
 tags:
   - rss
 meldungen: 3
 feeds: 2
 ---
 
-Freitag, 20. November 2026 · 3 Meldungen aus 2 Feeds
+3 Meldungen aus 2 Feeds
 
 ## heise online
 

@@ -34,10 +34,10 @@ test('Verbindung prüfen und Tag senden', async (t) => {
   assert.equal(first.ok, true);
   assert.equal(first.changed, true);
   assert.equal(first.count, 1);
-  assert.equal(first.rel, 'RSS/2026/2026-11-20 Tageszusammenfassung.md');
-  assert.equal(first.href, `${books.url}/view/RSS/2026/2026-11-20%20Tageszusammenfassung.md`);
+  assert.equal(first.rel, 'RSS/2026/11 November/2026-11-20 Tageszusammenfassung.md');
+  assert.equal(first.href, `${books.url}/view/RSS/2026/11%20November/2026-11-20%20Tageszusammenfassung.md`);
   const put = books.requests.find((r) => r.method === 'PUT');
-  assert.equal(put.url, '/api/sources/files/2026/2026-11-20%20Tageszusammenfassung.md');
+  assert.equal(put.url, '/api/sources/files/2026/11%20November/2026-11-20%20Tageszusammenfassung.md');
   assert.match(put.headers['content-type'], /^text\/markdown/);
   assert.match(books.files.get(first.rel), /daily: 2026-11-20[\s\S]*\[Hallo\]\(https:\/\/x\.example\/\)/);
 
