@@ -1,0 +1,19 @@
+# Start: mkdir -p data && docker compose up -d
+# Einstellungen per .env neben dieser Datei (siehe README, Abschnitt Docker).
+services:
+  rss:
+    build: .
+    image: rss
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    # Läuft als dieser Benutzer; ihm muss RSS_DIR gehören (Synology: meist 1026:100)
+    user: "${RSS_UID:-1000}:${RSS_GID:-1000}"
+    ports:
+      - "${RSS_PUBLISH:-3001}:3001"
+    volumes:
+      - "${RSS_DIR:-./data}:/data"
+    environment:
+      TZ: ${RSS_TZ:-Europe/Berlin}
+      # Optional: Passwort für die Oberfläche (Browser fragt per HTTP-Basic-Anmeldung, Benutzername beliebig)
+      RSS_PASSWORD: ${RSS_PASSWORD:-}
